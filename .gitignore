@@ -31,3 +31,4 @@ bin/
 *.log
 *.swp
 *.bak
+local.properties

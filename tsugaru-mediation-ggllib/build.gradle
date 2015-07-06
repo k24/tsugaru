@@ -1,0 +1,59 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:1.2.3'
+    }
+}
+
+apply plugin: 'com.android.library'
+
+allprojects {
+    repositories {
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
+        mavenCentral()
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+
+    compile 'com.google.code.gson:gson:2.3.1'
+    compile 'com.mcxiaoke.volley:library:1.0.16'
+    compile 'com.google.guava:guava:18.0'
+
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.robolectric:robolectric:3.0-SNAPSHOT'
+    testCompile ('com.squareup.okhttp:mockwebserver:2.4.0') {
+        exclude module: 'bcprov-jdk15on'
+    }
+    testCompile 'com.squareup.assertj:assertj-android:1.0.0'
+}
+
+task copyTsugaru(type: Copy) {
+    def libsDir = new File(rootProject.projectDir, 'libs')
+    libsDir.mkdir()
+    from fileTree(dir: new File(rootProject.projectDir, '../tsugaru/build/libs'), include: '*.jar') into libsDir
+}
+
+android {
+    compileSdkVersion 'android-22'
+    buildToolsVersion '22.0.1'
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
+
+    buildTypes {
+        release {
+            //runProguard false
+            proguardFile getDefaultProguardFile('proguard-android.txt')
+        }
+    }
+
+    defaultConfig {
+        multiDexEnabled = true
+    }
+}
