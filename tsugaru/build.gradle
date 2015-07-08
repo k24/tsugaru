@@ -16,7 +16,7 @@ repositories {
 
 dependencies {
     // Testing
-    testCompile group: 'junit', name: 'junit', version: '4.11'
+    testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:2.0.24-beta'
 
     // JSON

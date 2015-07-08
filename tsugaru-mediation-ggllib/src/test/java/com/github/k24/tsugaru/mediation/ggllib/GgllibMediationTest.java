@@ -2,25 +2,26 @@ package com.github.k24.tsugaru.mediation.ggllib;
 
 import com.android.volley.Request;
 import com.github.k24.tsugaru.Tsugaru;
-import com.github.k24.tsugaru.gglib.GgllibMediation;
-import com.github.k24.tsugaru.gglib.VolleyNetworkLane;
 import com.github.k24.tsugaru.lane.EventBusLane;
 import com.github.k24.tsugaru.lane.NetworkLane;
-import com.github.k24.tsugaru.mediation.ggllib.BuildConfig;
+import com.github.k24.tsugaru.mediation.gglib.GgllibMediation;
+import com.github.k24.tsugaru.mediation.gglib.GsonJsonLane;
+import com.github.k24.tsugaru.mediation.gglib.VolleyNetworkLane;
+import com.google.gson.FieldNamingPolicy;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.squareup.okhttp.mockwebserver.MockResponse;
 import com.squareup.okhttp.mockwebserver.MockWebServer;
 import com.squareup.okhttp.mockwebserver.RecordedRequest;
 
 import org.assertj.core.api.Assertions;
-import org.junit.Assert;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
-import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowApplication;
-import org.robolectric.shadows.ShadowLooper;
 
 import java.io.IOException;
 import java.net.URL;
@@ -29,15 +30,26 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
+ * Test GgllibMediation.
+ * <p/>
  * Created by k24 on 2015/07/05.
  */
 @RunWith(org.robolectric.RobolectricTestRunner.class)
 @Config(constants = BuildConfig.class)
 public class GgllibMediationTest {
 
+    private GgllibMediation mediation;
+
     @Before
     public void setUp() {
-        Tsugaru.Configuration.apply(new GgllibMediation(ShadowApplication.getInstance().getApplicationContext()));
+        mediation = new GgllibMediation(ShadowApplication.getInstance().getApplicationContext());
+        Tsugaru.Configuration.apply(mediation);
+    }
+
+    @After
+    public void tearDown() {
+        VolleyNetworkLane volleyLane = mediation.getImplementation(NetworkLane.class);
+        volleyLane.stop();
     }
 
     @Test
@@ -72,6 +84,26 @@ public class GgllibMediationTest {
         String encoded = Tsugaru.json().encode(new Sample("str", 1984));
         Sample decoded = Tsugaru.json().decode(encoded, Sample.class);
 
+        Assertions.assertThat(decoded.string)
+                .isEqualTo("str");
+        Assertions.assertThat(decoded.integer)
+                .isEqualTo(1984);
+    }
+
+    @Test
+    public void jsonWithBuoy() {
+        String encoded = Tsugaru.json(GsonJsonLane.arrangeGson(new GsonJsonLane.Arranger() {
+            @Override
+            public Gson arrange() {
+                return new GsonBuilder()
+                        .setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE)
+                        .create();
+            }
+        })).encode(new Sample("str", 1984));
+        Sample decoded = Tsugaru.json().decode(encoded.toLowerCase(), Sample.class);
+
+        Assertions.assertThat(encoded)
+                .contains("String", "Integer"); // See FieldNamingPolicy
         Assertions.assertThat(decoded.string)
                 .isEqualTo("str");
         Assertions.assertThat(decoded.integer)

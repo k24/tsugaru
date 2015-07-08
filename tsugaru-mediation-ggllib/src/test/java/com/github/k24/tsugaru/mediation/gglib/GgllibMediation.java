@@ -1,6 +1,7 @@
-package com.github.k24.tsugaru.gglib;
+package com.github.k24.tsugaru.mediation.gglib;
 
 import android.content.Context;
+
 import com.github.k24.tsugaru.SimpleMediation;
 import com.github.k24.tsugaru.lane.EventBusLane;
 import com.github.k24.tsugaru.lane.JsonLane;
@@ -9,6 +10,8 @@ import com.github.k24.tsugaru.lane.NetworkLane;
 import java.util.HashMap;
 
 /**
+ * Mediation implementation with G's libraries.
+ * <p/>
  * Created by k24 on 2015/07/04.
  */
 public class GgllibMediation extends SimpleMediation {
@@ -21,6 +24,11 @@ public class GgllibMediation extends SimpleMediation {
 
     public void clear() {
         instanceMap.clear();
+    }
+
+    @SuppressWarnings("unchecked")
+    public <Lane, Impl extends Lane> Impl getImplementation(Class<Lane> laneClass) {
+        return (Impl) getLane(laneClass);
     }
 
     @SuppressWarnings("unchecked")

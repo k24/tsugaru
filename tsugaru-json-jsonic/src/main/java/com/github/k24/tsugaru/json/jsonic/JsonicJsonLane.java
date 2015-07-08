@@ -2,10 +2,13 @@ package com.github.k24.tsugaru.json.jsonic;
 
 import com.github.k24.tsugaru.buoy.Sticky;
 import com.github.k24.tsugaru.lane.JsonLane;
+
 import net.arnx.jsonic.JSON;
 import net.arnx.jsonic.NamingStyle;
 
 /**
+ * JsonLane implementation with JSONIC.
+ * <p/>
  * Created by k24 on 2015/07/04.
  */
 public class JsonicJsonLane implements JsonLane {

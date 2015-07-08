@@ -1,6 +1,7 @@
-package com.github.k24.tsugaru.gglib;
+package com.github.k24.tsugaru.mediation.gglib;
 
 import android.content.Context;
+
 import com.android.volley.NetworkResponse;
 import com.android.volley.RequestQueue;
 import com.android.volley.ServerError;
@@ -10,6 +11,8 @@ import com.android.volley.toolbox.Volley;
 import com.github.k24.tsugaru.lane.NetworkLane;
 
 /**
+ * Network implementation with Volley.
+ * <p/>
  * Created by k24 on 2015/07/05.
  */
 public class VolleyNetworkLane implements NetworkLane {

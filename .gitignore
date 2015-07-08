@@ -32,3 +32,4 @@ bin/
 *.swp
 *.bak
 local.properties
+bintray.properties

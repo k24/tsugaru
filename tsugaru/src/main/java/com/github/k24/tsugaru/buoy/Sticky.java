@@ -6,6 +6,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * Indicate change is sticky.
+ * <p/>
  * Created by k24 on 2015/07/04.
  */
 @Retention(RetentionPolicy.SOURCE)

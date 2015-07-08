@@ -291,6 +291,7 @@ public class TsugaruTest {
         });
         promise.waitForCompletion();
         Assert.assertEquals("OK", resultValue.get());
+        //noinspection ThrowableResultOfMethodCallIgnored
         Assert.assertEquals("reason", resultReason.get().getMessage());
 
         // logger

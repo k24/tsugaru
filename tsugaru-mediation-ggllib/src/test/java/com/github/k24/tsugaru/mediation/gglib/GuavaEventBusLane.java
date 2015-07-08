@@ -1,4 +1,4 @@
-package com.github.k24.tsugaru.gglib;
+package com.github.k24.tsugaru.mediation.gglib;
 
 import com.github.k24.tsugaru.lane.EventBusLane;
 import com.google.common.eventbus.EventBus;
@@ -9,6 +9,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
+ * EventBus implementation with Guava.
+ * <p/>
  * Created by k24 on 2015/07/05.
  */
 public class GuavaEventBusLane implements EventBusLane {
