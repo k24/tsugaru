@@ -1,4 +1,4 @@
-package com.github.k24.tsugaru.mediation.gglib;
+package com.github.k24.tsugaru.mediation.ggllib;
 
 import android.content.Context;
 

@@ -2,7 +2,7 @@ package com.github.k24.tsugaru.lane;
 
 import com.github.k24.tsugaru.buoy.BuoyTemplate;
 
-import java.util.Map;
+import java.io.InputStream;
 
 /**
  * Lane to network.
@@ -11,34 +11,25 @@ import java.util.Map;
  */
 public interface NetworkLane {
 
-    /**
-     * Send a request to get a response.
-     *
-     * @param request to send
-     * @return an instance of the response
-     */
-    void call(Request request);
+    Request request(String url);
 
-    /**
-     * Request to send.
-     */
     interface Request {
-        /**
-         * URL.
-         *
-         * @return as String
-         */
-        String url();
+        Request header(String name, String value);
 
-        /**
-         * Get a value for an option.
-         *
-         * @param key          to a value
-         * @param defaultValue of an option
-         * @return a value for an option
-         */
-        <T> T option(String key, T defaultValue);
+        Request body(byte[] bytes);
 
+        Request field(String name, String value);
+
+        Connection call(OnResponseListener onResponseListener);
+    }
+
+    interface Connection {
+        void cancel();
+
+        float progress();
+    }
+
+    interface OnResponseListener {
         void onResponse(Response response);
     }
 
@@ -46,12 +37,19 @@ public interface NetworkLane {
      * Response gotten.
      */
     interface Response {
+        String CLASS_STRING = "java.lang.String";
+        String CLASS_INPUT_STREAM = "java.io.InputStream";
+        String CLASS_READER = "java.io.Reader";
+        String CLASS_BYTES = "[B";
+        String CLASS_CHARS = "[C";
+        String CLASS_INTS = "[I";
+
         /**
          * Content gotten.
          *
-         * @return bytes of the content
+         * @return the object matched an acceptable class of the content
          */
-        byte[] body();
+        Object content(Class<?>... acceptableClasses);
 
         /**
          * Error occurred.
@@ -66,6 +64,18 @@ public interface NetworkLane {
      * <p/>
      * By default, this has no meaning.
      */
-    interface Buoy extends BuoyTemplate<NetworkLane> {
+    abstract class Buoy extends BuoyTemplate<NetworkLane> {
+        @Override
+        public NetworkLane arrange(NetworkLane lane) {
+            if (lane instanceof Acceptable) {
+                return ((Acceptable) lane).accept(this);
+            }
+            throwIfRequired();
+            return lane;
+        }
+    }
+
+    interface Acceptable {
+        NetworkLane accept(Buoy buoy);
     }
 }

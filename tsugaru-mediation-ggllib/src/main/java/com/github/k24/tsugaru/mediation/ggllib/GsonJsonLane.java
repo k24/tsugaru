@@ -1,6 +1,5 @@
-package com.github.k24.tsugaru.mediation.gglib;
+package com.github.k24.tsugaru.mediation.ggllib;
 
-import com.github.k24.tsugaru.buoy.Sticky;
 import com.github.k24.tsugaru.buoy.Volatile;
 import com.github.k24.tsugaru.lane.JsonLane;
 import com.google.gson.Gson;

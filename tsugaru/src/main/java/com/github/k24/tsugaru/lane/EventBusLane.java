@@ -60,6 +60,18 @@ public interface EventBusLane {
      * <p/>
      * By default, this has no meaning.
      */
-    interface Buoy extends BuoyTemplate<EventBusLane> {
+    abstract class Buoy extends BuoyTemplate<EventBusLane> {
+        @Override
+        public EventBusLane arrange(EventBusLane lane) {
+            if(lane instanceof Acceptable) {
+                return ((Acceptable)lane).accept(this);
+            }
+            throwIfRequired();
+            return lane;
+        }
+    }
+
+    interface Acceptable {
+        EventBusLane accept(Buoy buoy);
     }
 }

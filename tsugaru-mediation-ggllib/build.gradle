@@ -33,9 +33,9 @@ dependencies {
 }
 
 task copyTsugaru(type: Copy) {
-    def libsDir = new File(rootProject.projectDir, 'libs')
+    def libsDir = new File(projectDir, 'libs')
     libsDir.mkdir()
-    from fileTree(dir: new File(rootProject.projectDir, '../tsugaru/build/libs'), include: '*.jar') into libsDir
+    from fileTree(dir: new File(projectDir, '../tsugaru/build/libs'), include: '*.jar') into libsDir
 }
 
 android {

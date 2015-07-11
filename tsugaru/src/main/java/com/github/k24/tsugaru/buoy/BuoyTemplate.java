@@ -5,7 +5,7 @@ package com.github.k24.tsugaru.buoy;
  * <p/>
  * Created by k24 on 2015/06/30.
  */
-public interface BuoyTemplate<Lane> {
+public abstract class BuoyTemplate<Lane> {
     /**
      * Arrange this for a lane.
      * <p/>
@@ -14,5 +14,13 @@ public interface BuoyTemplate<Lane> {
      * @param lane to arrange this for
      * @return an instance of lane arranged this
      */
-    Lane arrange(Lane lane);
+    public abstract Lane arrange(Lane lane);
+
+    protected void throwIfRequired() {
+        if (isRequired()) throw new UnsupportedOperationException();
+    }
+
+    protected boolean isRequired() {
+        return false;
+    }
 }

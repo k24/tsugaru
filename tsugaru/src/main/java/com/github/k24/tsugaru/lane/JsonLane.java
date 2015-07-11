@@ -31,6 +31,19 @@ public interface JsonLane {
      * <p/>
      * By default, this has no meaning.
      */
-    interface Buoy extends BuoyTemplate<JsonLane> {
+    abstract class Buoy extends BuoyTemplate<JsonLane> {
+        @Override
+        public JsonLane arrange(JsonLane lane) {
+            if(lane instanceof Acceptable) {
+                return ((Acceptable)lane).accept(this);
+            }
+            throwIfRequired();
+            return lane;
+        }
     }
+
+    interface Acceptable {
+        JsonLane accept(Buoy buoy);
+    }
+
 }

@@ -31,6 +31,18 @@ public interface StoreLane {
      * <p/>
      * By default, this has no meaning.
      */
-    interface Buoy extends BuoyTemplate<StoreLane> {
+    abstract class Buoy extends BuoyTemplate<StoreLane> {
+        @Override
+        public StoreLane arrange(StoreLane lane) {
+            if(lane instanceof Acceptable) {
+                return ((Acceptable)lane).accept(this);
+            }
+            throwIfRequired();
+            return lane;
+        }
+    }
+
+    interface Acceptable {
+        StoreLane accept(Buoy buoy);
     }
 }

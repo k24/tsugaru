@@ -1,4 +1,4 @@
-package com.github.k24.tsugaru.mediation.gglib;
+package com.github.k24.tsugaru.mediation.ggllib;
 
 import com.github.k24.tsugaru.lane.EventBusLane;
 import com.google.common.eventbus.EventBus;

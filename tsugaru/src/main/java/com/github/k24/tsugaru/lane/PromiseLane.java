@@ -149,6 +149,18 @@ public interface PromiseLane {
      * <p/>
      * By default, this has no meaning.
      */
-    interface Buoy extends BuoyTemplate<PromiseLane> {
+    abstract class Buoy extends BuoyTemplate<PromiseLane> {
+        @Override
+        public PromiseLane arrange(PromiseLane lane) {
+            if(lane instanceof Acceptable) {
+                return ((Acceptable)lane).accept(this);
+            }
+            throwIfRequired();
+            return lane;
+        }
+    }
+
+    interface Acceptable {
+        PromiseLane accept(Buoy buoy);
     }
 }

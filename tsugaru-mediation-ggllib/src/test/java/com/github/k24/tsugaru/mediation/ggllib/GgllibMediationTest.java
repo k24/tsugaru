@@ -1,12 +1,8 @@
 package com.github.k24.tsugaru.mediation.ggllib;
 
-import com.android.volley.Request;
 import com.github.k24.tsugaru.Tsugaru;
 import com.github.k24.tsugaru.lane.EventBusLane;
 import com.github.k24.tsugaru.lane.NetworkLane;
-import com.github.k24.tsugaru.mediation.gglib.GgllibMediation;
-import com.github.k24.tsugaru.mediation.gglib.GsonJsonLane;
-import com.github.k24.tsugaru.mediation.gglib.VolleyNetworkLane;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -123,31 +119,19 @@ public class GgllibMediationTest {
 
             final AtomicReference<NetworkLane.Response> responseRef = new AtomicReference<>();
             final CountDownLatch latch = new CountDownLatch(1);
-            Tsugaru.network().call(new NetworkLane.Request() {
-                @Override
-                public String url() {
-                    return url.toString();
-                }
-
-                @Override
-                public <T> T option(String s, T t) {
-                    if (VolleyNetworkLane.OPTION_METHOD.equals(s)) {
-                        return (T) (Integer) Request.Method.POST;
-                    }
-                    return t;
-                }
-
-                @Override
-                public void onResponse(NetworkLane.Response response) {
-                    responseRef.set(response);
-                    latch.countDown();
-                }
-            });
+            Tsugaru.network().request(url.toString())
+                    .call(new NetworkLane.OnResponseListener() {
+                        @Override
+                        public void onResponse(NetworkLane.Response response) {
+                            responseRef.set(response);
+                            latch.countDown();
+                        }
+                    });
 
             // Verify Request
             RecordedRequest recordedRequest = server.takeRequest(500, TimeUnit.MILLISECONDS);
             Assertions.assertThat(recordedRequest.getMethod())
-                    .isEqualTo("POST");
+                    .isEqualTo("GET");
 
             // Verify Response
 
@@ -167,8 +151,8 @@ public class GgllibMediationTest {
             NetworkLane.Response response = responseRef.get();
             Assertions.assertThat(response.error())
                     .isNull();
-            Assertions.assertThat(response.body())
-                    .isEqualTo("responded".getBytes());
+            Assertions.assertThat(response.content(String.class))
+                    .isEqualTo("responded");
         } finally {
             server.shutdown();
         }

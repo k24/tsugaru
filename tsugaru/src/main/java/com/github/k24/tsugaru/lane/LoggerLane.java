@@ -30,6 +30,18 @@ public interface LoggerLane {
      * <p/>
      * By default, this has no meaning.
      */
-    interface Buoy extends BuoyTemplate<LoggerLane> {
+    abstract class Buoy extends BuoyTemplate<LoggerLane> {
+        @Override
+        public LoggerLane arrange(LoggerLane lane) {
+            if(lane instanceof Acceptable) {
+                return ((Acceptable)lane).accept(this);
+            }
+            throwIfRequired();
+            return lane;
+        }
+    }
+
+    interface Acceptable {
+        LoggerLane accept(Buoy buoy);
     }
 }

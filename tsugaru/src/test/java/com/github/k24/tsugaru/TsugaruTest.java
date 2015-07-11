@@ -3,10 +3,15 @@ package com.github.k24.tsugaru;
 import com.github.k24.tsugaru.lane.*;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import com.squareup.okhttp.Call;
+import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.ResponseBody;
 import com.squareup.okhttp.mockwebserver.MockResponse;
 import com.squareup.okhttp.mockwebserver.MockWebServer;
+
 import net.arnx.jsonic.JSON;
+
 import org.jdeferred.DonePipe;
 import org.jdeferred.FailPipe;
 import org.jdeferred.Promise;
@@ -148,30 +153,18 @@ public class TsugaruTest {
 
         // network
         NetworkLane networkLane = Mockito.mock(NetworkLane.class);
+        NetworkLane.Request networkRequest = Mockito.mock(NetworkLane.Request.class);
+        Mockito.stub(networkLane.request(Mockito.anyString())).toReturn(networkRequest);
 
         Tsugaru.Configuration.configurator()
                 .network(networkLane)
                 .apply();
 
-        NetworkLane.Request request = new NetworkLane.Request() {
-            @Override
-            public String url() {
-                return "OK";
-            }
+        Tsugaru.network().request("url")
+                .body("body".getBytes());
 
-            @Override
-            public <T> T option(String key, T defaultValue) {
-                return null;
-            }
-
-            @Override
-            public void onResponse(NetworkLane.Response response) {
-            }
-        };
-
-        Tsugaru.network().call(request);
-
-        Mockito.verify(networkLane).call(request);
+        Mockito.verify(networkLane).request("url");
+        Mockito.verify(networkRequest).body("body".getBytes());
 
         // promise
         PromiseLane promiseLane = Mockito.mock(PromiseLane.class);
@@ -243,27 +236,18 @@ public class TsugaruTest {
         try {
             final AtomicReference<NetworkLane.Response> responseRef = new AtomicReference<>();
             final CountDownLatch countDownLatch = new CountDownLatch(1);
-            Tsugaru.network().call(new NetworkLane.Request() {
-                @Override
-                public String url() {
-                    return url.toString();
-                }
-
-                @Override
-                public <T> T option(String key, T defaultValue) {
-                    return null;
-                }
-
-                @Override
-                public void onResponse(NetworkLane.Response response) {
-                    responseRef.set(response);
-                    countDownLatch.countDown();
-                }
-            });
+            Tsugaru.network().request(url.toString())
+                    .call(new NetworkLane.OnResponseListener() {
+                        @Override
+                        public void onResponse(NetworkLane.Response response) {
+                            responseRef.set(response);
+                            countDownLatch.countDown();
+                        }
+                    });
             countDownLatch.await();
             NetworkLane.Response response = responseRef.get();
             Assert.assertNull(response.error());
-            Assert.assertEquals("ok", new String(response.body()));
+            Assert.assertEquals("ok", response.content(String.class));
         } finally {
             server.shutdown();
         }
@@ -371,42 +355,109 @@ public class TsugaruTest {
             }
         };
         private NetworkLane networkLane = new NetworkLane() {
+            OkHttpClient httpClient = new OkHttpClient();
             @Override
-            public void call(Request request) {
-                try {
-                    com.squareup.okhttp.Response response = new OkHttpClient().newCall(new com.squareup.okhttp.Request.Builder()
-                            .url(request.url())
-                            .build())
-                            .execute();
-                    if (response.isSuccessful()) {
-                        final byte[] body = response.body().bytes();
-                        request.onResponse(new Response() {
+            public Request request(final String url) {
+                return new Request() {
+                    final com.squareup.okhttp.Request.Builder builder = new com.squareup.okhttp.Request.Builder().url(url);
+
+                    @Override
+                    public Request header(String name, String value) {
+                        builder.header(name, value);
+                        return this;
+                    }
+
+                    @Override
+                    public Request body(byte[] bytes) {
+                        // Unused this testing.
+                        return this;
+                    }
+
+                    @Override
+                    public Request field(String name, String value) {
+                        // Unused this testing.
+                        return this;
+                    }
+
+                    @Override
+                    public Connection call(final OnResponseListener onResponseListener) {
+                        final Call call = httpClient.newCall(builder.build());
+                        call.enqueue(new Callback() {
                             @Override
-                            public byte[] body() {
-                                return body;
+                            public void onFailure(com.squareup.okhttp.Request request, final IOException e) {
+                                onResponseListener.onResponse(new Response() {
+                                    @Override
+                                    public Object content(Class<?>... acceptableClasses) {
+                                        return null;
+                                    }
+
+                                    @Override
+                                    public Exception error() {
+                                        return e;
+                                    }
+                                });
                             }
 
                             @Override
-                            public Exception error() {
-                                return null;
+                            public void onResponse(final com.squareup.okhttp.Response response) throws IOException {
+                                if (response.isSuccessful()) {
+                                    onResponseListener.onResponse(new Response() {
+                                        @Override
+                                        public Object content(Class<?>... acceptableClasses) {
+                                            try {
+                                                ResponseBody body = response.body();
+                                                for (Class<?> acceptableClass : acceptableClasses) {
+                                                    // Just a sample implementation.
+                                                    switch (acceptableClass.getName()) {
+                                                        case CLASS_STRING:
+                                                            return body.string();
+                                                        case CLASS_READER:
+                                                            return body.charStream();
+                                                        case CLASS_INPUT_STREAM:
+                                                            return body.byteStream();
+                                                        default:
+                                                            // continue;
+                                                    }
+                                                }
+                                                return body.bytes();
+                                            } catch (IOException e) {
+                                                return e;
+                                            }
+                                        }
+
+                                        @Override
+                                        public Exception error() {
+                                            return null;
+                                        }
+                                    });
+                                } else {
+                                    onResponseListener.onResponse(new Response() {
+                                        @Override
+                                        public Object content(Class<?>... acceptableClasses) {
+                                            return null;
+                                        }
+
+                                        @Override
+                                        public Exception error() {
+                                            return new RuntimeException("" + response.code());
+                                        }
+                                    });
+                                }
                             }
                         });
-                    } else {
-                        throw new RuntimeException("" + response.code());
-                    }
-                } catch (final Exception e) {
-                    request.onResponse(new Response() {
-                        @Override
-                        public byte[] body() {
-                            return null;
-                        }
+                        return new Connection() {
+                            @Override
+                            public void cancel() {
+                                call.cancel();
+                            }
 
-                        @Override
-                        public Exception error() {
-                            return e;
-                        }
-                    });
-                }
+                            @Override
+                            public float progress() {
+                                return 0;
+                            }
+                        };
+                    }
+                };
             }
         };
         private PromiseLane promiseLane = new PromiseLane() {
