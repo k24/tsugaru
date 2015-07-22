@@ -62,7 +62,7 @@ public interface EventBusLane {
      */
     abstract class Buoy extends BuoyTemplate<EventBusLane> {
         @Override
-        public EventBusLane arrange(EventBusLane lane) {
+        public EventBusLane placeTo(EventBusLane lane) {
             if(lane instanceof Acceptable) {
                 return ((Acceptable)lane).accept(this);
             }

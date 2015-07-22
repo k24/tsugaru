@@ -151,7 +151,7 @@ public interface PromiseLane {
      */
     abstract class Buoy extends BuoyTemplate<PromiseLane> {
         @Override
-        public PromiseLane arrange(PromiseLane lane) {
+        public PromiseLane placeTo(PromiseLane lane) {
             if(lane instanceof Acceptable) {
                 return ((Acceptable)lane).accept(this);
             }

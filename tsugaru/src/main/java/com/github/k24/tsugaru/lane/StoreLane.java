@@ -33,7 +33,7 @@ public interface StoreLane {
      */
     abstract class Buoy extends BuoyTemplate<StoreLane> {
         @Override
-        public StoreLane arrange(StoreLane lane) {
+        public StoreLane placeTo(StoreLane lane) {
             if(lane instanceof Acceptable) {
                 return ((Acceptable)lane).accept(this);
             }

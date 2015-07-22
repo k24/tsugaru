@@ -1,6 +1,8 @@
 import com.github.k24.tsugaru.Tsugaru;
 import com.github.k24.tsugaru.json.jsonic.JsonicJsonLane;
+import com.github.k24.tsugaru.lane.JsonLane;
 
+import net.arnx.jsonic.JSON;
 import net.arnx.jsonic.NamingStyle;
 
 import org.junit.Assert;
@@ -28,13 +30,22 @@ public class JsonicJsonLaneTest {
     @Test
     public void encodeAndDecodeWithBuoy() {
         Tsugaru.Configuration.configurator()
-                .json(new JsonicJsonLane())
+                .json(new JsonicJsonLane(new JsonicJsonLane.JsonFactory() {
+                    @Override
+                    public JSON newJsonDefault() {
+                        JSON json = new JSON();
+                        json.setPrettyPrint(true);
+                        return json;
+                    }
+                }))
                 .apply();
 
-        String encoded = Tsugaru.json(JsonicJsonLane.prettyPrint(true), JsonicJsonLane.propertyStyle(NamingStyle.UPPER_CASE)).encode(new SomeObject("Hi", 4649));
-        Assert.assertTrue(encoded.contains("STRING"));
-        Assert.assertTrue(encoded.contains("INTEGER"));
-        Assert.assertTrue(encoded.split("\n").length == 4);
+        String encoded = Tsugaru.json(new JsonLane.GenericBuoy.Builder()
+                .setNamingRule(JsonicJsonLane.GenericBuoy.NAMING_UPPER_CAMEL)
+                .create()).encode(new SomeObject("Hi", 4649));
+        Assert.assertTrue(encoded.contains("String"));
+        Assert.assertTrue(encoded.contains("Integer"));
+        Assert.assertTrue(encoded, encoded.split("\n").length == 4);
     }
 
     public static class SomeObject {

@@ -7,20 +7,20 @@ package com.github.k24.tsugaru.buoy;
  */
 public abstract class BuoyTemplate<Lane> {
     /**
-     * Arrange this for a lane.
+     * For Arrangement a lane.
      * <p/>
      * If configuring in runtime is needed, use this method and return an instance configured.
      *
-     * @param lane to arrange this for
-     * @return an instance of lane arranged this
+     * @param lane to be placed
+     * @return an instance of lane
      */
-    public abstract Lane arrange(Lane lane);
+    public abstract Lane placeTo(Lane lane);
 
     protected void throwIfRequired() {
         if (isRequired()) throw new UnsupportedOperationException();
     }
 
-    protected boolean isRequired() {
+    public boolean isRequired() {
         return false;
     }
 }

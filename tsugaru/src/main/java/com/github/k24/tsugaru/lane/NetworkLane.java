@@ -66,7 +66,7 @@ public interface NetworkLane {
      */
     abstract class Buoy extends BuoyTemplate<NetworkLane> {
         @Override
-        public NetworkLane arrange(NetworkLane lane) {
+        public NetworkLane placeTo(NetworkLane lane) {
             if (lane instanceof Acceptable) {
                 return ((Acceptable) lane).accept(this);
             }

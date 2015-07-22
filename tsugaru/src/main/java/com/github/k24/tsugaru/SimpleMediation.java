@@ -12,7 +12,7 @@ public abstract class SimpleMediation implements Mediation {
     @SafeVarargs
     public static <T> T arrange(T lane, BuoyTemplate<T>... buoys) {
         for (BuoyTemplate<T> buoy : buoys) {
-            lane = buoy.arrange(lane);
+            lane = buoy.placeTo(lane);
         }
         return lane;
     }

@@ -32,7 +32,7 @@ public interface LoggerLane {
      */
     abstract class Buoy extends BuoyTemplate<LoggerLane> {
         @Override
-        public LoggerLane arrange(LoggerLane lane) {
+        public LoggerLane placeTo(LoggerLane lane) {
             if(lane instanceof Acceptable) {
                 return ((Acceptable)lane).accept(this);
             }
