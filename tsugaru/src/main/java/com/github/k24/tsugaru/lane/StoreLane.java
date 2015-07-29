@@ -4,7 +4,7 @@ import com.github.k24.tsugaru.buoy.BuoyTemplate;
 
 /**
  * Lane to a storage.
- * <p/>
+ * <p>
  * Created by k24 on 2015/06/23.
  */
 public interface StoreLane {
@@ -28,21 +28,23 @@ public interface StoreLane {
 
     /**
      * To arrange the lane.
-     * <p/>
+     * <p>
      * By default, this has no meaning.
      */
     abstract class Buoy extends BuoyTemplate<StoreLane> {
         @Override
         public StoreLane placeTo(StoreLane lane) {
-            if(lane instanceof Acceptable) {
-                return ((Acceptable)lane).accept(this);
+            if (lane instanceof Arrangeable) {
+                return accept((Arrangeable) lane);
             }
             throwIfRequired();
             return lane;
         }
+
+        protected abstract StoreLane accept(Arrangeable arrangeable);
     }
 
-    interface Acceptable {
-        StoreLane accept(Buoy buoy);
+    interface Arrangeable extends StoreLane {
+        StoreLane arrange(Buoy buoy);
     }
 }

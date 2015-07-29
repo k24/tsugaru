@@ -4,7 +4,7 @@ import com.github.k24.tsugaru.buoy.BuoyTemplate;
 
 /**
  * Lane to a promise
- * <p/>
+ * <p>
  * Created by k24 on 2015/06/24.
  */
 public interface PromiseLane {
@@ -114,7 +114,7 @@ public interface PromiseLane {
     interface OnResolved<T> {
         /**
          * Called when resolved.
-         * <p/>
+         * <p>
          * Return a value to keep resolved.
          * Or for notifying an error, throw Exception.
          *
@@ -133,7 +133,7 @@ public interface PromiseLane {
     interface OnRejected<T> {
         /**
          * Called when rejected.
-         * <p/>
+         * <p>
          * Rethrow Exception to keep rejected.
          * Or for twisting to success, return a value.
          *
@@ -146,21 +146,61 @@ public interface PromiseLane {
 
     /**
      * To arrange the lane.
-     * <p/>
+     * <p>
      * By default, this has no meaning.
      */
     abstract class Buoy extends BuoyTemplate<PromiseLane> {
         @Override
         public PromiseLane placeTo(PromiseLane lane) {
-            if(lane instanceof Acceptable) {
-                return ((Acceptable)lane).accept(this);
+            if (lane instanceof Arrangeable) {
+                return accept((Arrangeable) lane);
             }
             throwIfRequired();
             return lane;
         }
+
+        protected abstract PromiseLane accept(Arrangeable arrangeable);
     }
 
-    interface Acceptable {
-        PromiseLane accept(Buoy buoy);
+    interface Arrangeable extends PromiseLane {
+        PromiseLane arrange(Buoy buoy);
+
+        PromiseLane arrange(GenericBuoy buoy);
+    }
+
+    final class GenericBuoy extends Buoy {
+
+        public static final String EXECUTE_ASAP = "Asap";
+        public static final String EXECUTE_IN_BACKGROUND = "InBackground";
+        public static final String EXECUTE_IN_MAIN = "InMain";
+
+        private final String whereToExecute;
+
+        GenericBuoy(String whereToExecute) {
+            this.whereToExecute = whereToExecute;
+        }
+
+        @Override
+        public boolean isRequired() {
+            return true;
+        }
+
+        @Override
+        protected PromiseLane accept(Arrangeable arrangeable) {
+            return arrangeable.arrange(this);
+        }
+
+        public static class Builder {
+            private String whereToExecute = EXECUTE_ASAP;
+
+            public Builder setWhereToExecute(String whereToExecute) {
+                this.whereToExecute = whereToExecute;
+                return this;
+            }
+
+            public GenericBuoy build() {
+                return new GenericBuoy(whereToExecute);
+            }
+        }
     }
 }

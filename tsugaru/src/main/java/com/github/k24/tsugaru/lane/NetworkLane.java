@@ -2,11 +2,9 @@ package com.github.k24.tsugaru.lane;
 
 import com.github.k24.tsugaru.buoy.BuoyTemplate;
 
-import java.io.InputStream;
-
 /**
  * Lane to network.
- * <p/>
+ * <p>
  * Created by k24 on 2015/06/24.
  */
 public interface NetworkLane {
@@ -61,21 +59,23 @@ public interface NetworkLane {
 
     /**
      * To arrange the lane.
-     * <p/>
+     * <p>
      * By default, this has no meaning.
      */
     abstract class Buoy extends BuoyTemplate<NetworkLane> {
         @Override
         public NetworkLane placeTo(NetworkLane lane) {
-            if (lane instanceof Acceptable) {
-                return ((Acceptable) lane).accept(this);
+            if (lane instanceof Arrangeable) {
+                return accept((Arrangeable) lane);
             }
             throwIfRequired();
             return lane;
         }
+
+        protected abstract NetworkLane accept(Arrangeable arrangeable);
     }
 
-    interface Acceptable {
-        NetworkLane accept(Buoy buoy);
+    interface Arrangeable extends NetworkLane {
+        NetworkLane arrange(Buoy buoy);
     }
 }

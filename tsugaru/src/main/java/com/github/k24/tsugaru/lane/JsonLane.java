@@ -7,7 +7,7 @@ import java.util.Map;
 
 /**
  * Lane to ship JSON.
- * <p/>
+ * <p>
  * Created by k24 on 2015/06/22.
  */
 public interface JsonLane {
@@ -31,7 +31,7 @@ public interface JsonLane {
 
     /**
      * To arrange the lane.
-     * <p/>
+     * <p>
      * By default, this has no meaning.
      */
     abstract class Buoy extends BuoyTemplate<JsonLane> {

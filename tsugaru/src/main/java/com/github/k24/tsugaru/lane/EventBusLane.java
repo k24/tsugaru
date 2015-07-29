@@ -4,7 +4,7 @@ import com.github.k24.tsugaru.buoy.BuoyTemplate;
 
 /**
  * Lane to ship an event via a bus.
- * <p/>
+ * <p>
  * Created by k24 on 2015/06/24.
  */
 public interface EventBusLane {
@@ -57,21 +57,23 @@ public interface EventBusLane {
 
     /**
      * To arrange the lane.
-     * <p/>
+     * <p>
      * By default, this has no meaning.
      */
     abstract class Buoy extends BuoyTemplate<EventBusLane> {
         @Override
         public EventBusLane placeTo(EventBusLane lane) {
-            if(lane instanceof Acceptable) {
-                return ((Acceptable)lane).accept(this);
+            if (lane instanceof Arrangeable) {
+                return accept((Arrangeable) lane);
             }
             throwIfRequired();
             return lane;
         }
+
+        protected abstract EventBusLane accept(Arrangeable arrangeable);
     }
 
-    interface Acceptable {
-        EventBusLane accept(Buoy buoy);
+    interface Arrangeable extends EventBusLane {
+        EventBusLane arrange(Buoy buoy);
     }
 }
