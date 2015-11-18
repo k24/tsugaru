@@ -2,10 +2,8 @@ package com.github.k24.tsugaru.mediation.ggllib;
 
 import com.github.k24.tsugaru.Tsugaru;
 import com.github.k24.tsugaru.lane.EventBusLane;
+import com.github.k24.tsugaru.lane.JsonLane;
 import com.github.k24.tsugaru.lane.NetworkLane;
-import com.google.gson.FieldNamingPolicy;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.squareup.okhttp.mockwebserver.MockResponse;
 import com.squareup.okhttp.mockwebserver.MockWebServer;
 import com.squareup.okhttp.mockwebserver.RecordedRequest;
@@ -88,14 +86,9 @@ public class GgllibMediationTest {
 
     @Test
     public void jsonWithBuoy() {
-        String encoded = Tsugaru.json(GsonJsonLane.arrangeGson(new GsonJsonLane.Arranger() {
-            @Override
-            public Gson arrange() {
-                return new GsonBuilder()
-                        .setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE)
-                        .create();
-            }
-        })).encode(new Sample("str", 1984));
+        String encoded = Tsugaru.json(new JsonLane.GenericBuoy.Builder()
+                .setNamingRule(JsonLane.GenericBuoy.NAMING_UPPER_CAMEL)
+                .create()).encode(new Sample("str", 1984));
         Sample decoded = Tsugaru.json().decode(encoded.toLowerCase(), Sample.class);
 
         Assertions.assertThat(encoded)

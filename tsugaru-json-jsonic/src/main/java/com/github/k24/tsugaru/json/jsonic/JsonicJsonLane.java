@@ -15,22 +15,16 @@ public class JsonicJsonLane implements JsonLane.Arrangeable {
 
     final JSON jsonToDecode;
     final JSON jsonToEncode;
-    private JsonFactory factory;
-    private InstanceMap instanceMap;
+    private final JsonFactory factory;
+    private final InstanceMap instanceMap = new InstanceMap();
 
     public JsonicJsonLane() {
-        this(new JsonFactory() {
-            @Override
-            public JSON newJsonDefault() {
-                return new JSON();
-            }
-        });
+        this(new JSON());
     }
 
     public JsonicJsonLane(JsonFactory factory) {
-        this(factory.newJsonDefault());
+        jsonToDecode = jsonToEncode = factory.newJsonDefault();
         this.factory = factory;
-        this.instanceMap = new InstanceMap();
     }
 
     protected JsonicJsonLane(JSON json) {
@@ -38,8 +32,18 @@ public class JsonicJsonLane implements JsonLane.Arrangeable {
     }
 
     public JsonicJsonLane(JSON jsonToDecode, JSON jsonToEncode) {
+        this(jsonToDecode, jsonToEncode, new JsonFactory() {
+            @Override
+            public JSON newJsonDefault() {
+                return new JSON();
+            }
+        });
+    }
+
+    public JsonicJsonLane(JSON jsonToDecode, JSON jsonToEncode, JsonFactory factory) {
         this.jsonToDecode = jsonToDecode;
         this.jsonToEncode = jsonToEncode;
+        this.factory = factory;
     }
 
     @Override
