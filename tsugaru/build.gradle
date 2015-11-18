@@ -1,11 +1,3 @@
-group 'com.github.k24.tsugaru'
-version '1.0-SNAPSHOT'
-
-task wrapper(type: Wrapper) {
-    gradleVersion = '2.2'
-    distributionUrl = "https://services.gradle.org/distributions/gradle-$gradleVersion-all.zip"
-}
-
 apply plugin: 'java'
 
 sourceCompatibility = 1.7
@@ -19,7 +11,7 @@ dependencies {
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:2.0.24-beta'
 
-    // JSON
+    // JSONls
     testCompile 'net.arnx:jsonic:1.3.7'
     // EventBus
     testCompile 'com.google.guava:guava:18.0'
@@ -28,4 +20,27 @@ dependencies {
     testCompile 'com.squareup.okhttp:mockwebserver:2.4.0'
     // Promise
     testCompile 'org.jdeferred:jdeferred-core:1.2.4'
+}
+
+// For archives
+apply plugin: 'maven'
+
+// For local install
+group 'com.github.k24.tsugaru'
+version tsugaruVersion
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    javadoc.failOnError false
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
 }

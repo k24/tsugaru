@@ -1,18 +1,40 @@
-group 'com.github.k24.tsugaru'
-version '1.0-SNAPSHOT'
 
 apply plugin: 'java'
 
 sourceCompatibility = 1.7
 
 repositories {
+    mavenLocal()
     mavenCentral()
 }
 
 dependencies {
-    compile project(path: ':tsugaru')
-//    compile 'com.github.k24.tsugaru:tsugaru:1.0-SNAPSHOT'
+    compile 'com.github.k24.tsugaru:tsugaru:' + tsugaruVersion
+
     compile 'net.arnx:jsonic:1.3.7'
 
     testCompile 'junit:junit:4.12'
+}
+
+// For archives
+apply plugin: 'maven'
+
+// For local install
+group 'com.github.k24.tsugaru'
+version '1.0.0'
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    javadoc.failOnError false
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
 }

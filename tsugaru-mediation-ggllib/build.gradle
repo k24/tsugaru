@@ -3,7 +3,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.2.3'
+        classpath 'com.android.tools.build:gradle:1.3.0'
     }
 }
 
@@ -11,31 +11,25 @@ apply plugin: 'com.android.library'
 
 allprojects {
     repositories {
+        mavenLocal()
         maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
         mavenCentral()
     }
 }
 
 dependencies {
-    // TODO Get Tsugaru from repo
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.github.k24.tsugaru:tsugaru:' + tsugaruVersion
 
-    compile 'com.google.code.gson:gson:2.3.1'
-    compile 'com.mcxiaoke.volley:library:1.0.16'
+    compile 'com.google.code.gson:gson:2.4'
+    compile 'com.mcxiaoke.volley:library:1.0.19'
     compile 'com.google.guava:guava:18.0'
 
     testCompile 'junit:junit:4.12'
-    testCompile 'org.robolectric:robolectric:3.0-SNAPSHOT'
+    testCompile 'org.robolectric:robolectric:3.0'
     testCompile ('com.squareup.okhttp:mockwebserver:2.4.0') {
         exclude module: 'bcprov-jdk15on'
     }
     testCompile 'com.squareup.assertj:assertj-android:1.0.0'
-}
-
-task copyTsugaru(type: Copy) {
-    def libsDir = new File(projectDir, 'libs')
-    libsDir.mkdir()
-    from fileTree(dir: new File(projectDir, '../tsugaru/build/libs'), include: '*.jar') into libsDir
 }
 
 android {
@@ -55,6 +49,6 @@ android {
     }
 
     defaultConfig {
-        multiDexEnabled = true
+        multiDexEnabled = false
     }
 }
