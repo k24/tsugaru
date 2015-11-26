@@ -5,10 +5,10 @@ buildscript {
 }
 
 ext {
-    tsugaruVersion = '1.0.0'
+    tsugaruVersion = '0.0.1'
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.4'
+    gradleVersion = '2.8'
     distributionUrl = "https://services.gradle.org/distributions/gradle-$gradleVersion-all.zip"
 }
